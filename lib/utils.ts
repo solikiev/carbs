@@ -41,26 +41,47 @@ export function calculateTotalActual(meals: MealData[]): number {
 }
 
 export function calculateTotalPlannedMin(meals: MealData[]): number {
-  return meals.reduce((sum, meal) => sum + meal.plannedMin, 0);
+  return meals.reduce((sum, meal) => sum + (meal.plannedMin ?? 0), 0);
 }
 
 export function calculateTotalPlannedMax(meals: MealData[]): number {
-  return meals.reduce((sum, meal) => sum + meal.plannedMax, 0);
+  return meals.reduce((sum, meal) => sum + (meal.plannedMax ?? 0), 0);
 }
 
 export function calculateRemaining(dayData: DayData): number {
   const totalActual = calculateTotalActual(dayData.meals);
-  return dayData.dailyTarget - totalActual;
+  // Use max target for remaining calculation, or 0 if not set
+  const target = dayData.dailyTargetMax ?? 0;
+  return target - totalActual;
 }
 
 export function calculateProgress(dayData: DayData): number {
   const totalActual = calculateTotalActual(dayData.meals);
-  return Math.min((totalActual / dayData.dailyTarget) * 100, 100);
+  const target = dayData.dailyTargetMax ?? 0;
+  if (target === 0) return 0;
+  return Math.min((totalActual / target) * 100, 100);
 }
 
 export function isOverTarget(dayData: DayData): boolean {
   const totalActual = calculateTotalActual(dayData.meals);
-  return totalActual > dayData.dailyTarget;
+  const max = dayData.dailyTargetMax;
+  if (max === null) return false;
+  return totalActual > max;
+}
+
+export function isUnderTarget(dayData: DayData): boolean {
+  const totalActual = calculateTotalActual(dayData.meals);
+  const min = dayData.dailyTargetMin;
+  if (min === null) return false;
+  return totalActual < min;
+}
+
+export function isWithinTarget(dayData: DayData): boolean {
+  const totalActual = calculateTotalActual(dayData.meals);
+  const min = dayData.dailyTargetMin;
+  const max = dayData.dailyTargetMax;
+  if (min === null || max === null) return false;
+  return totalActual >= min && totalActual <= max;
 }
 
 export function getDayStatusColor(dayData: DayData | null): string {
@@ -69,7 +90,23 @@ export function getDayStatusColor(dayData: DayData | null): string {
   const totalActual = calculateTotalActual(dayData.meals);
   if (totalActual === 0) return 'transparent';
   
-  return isOverTarget(dayData) ? '#ef4444' : '#10b981';
+  // If no target range is set, return transparent
+  if (dayData.dailyTargetMin === null || dayData.dailyTargetMax === null) {
+    return 'transparent';
+  }
+  
+  // Red: over max
+  if (totalActual > dayData.dailyTargetMax) {
+    return '#ef4444';
+  }
+  
+  // Yellow/Orange: under min
+  if (totalActual < dayData.dailyTargetMin) {
+    return '#f59e0b';
+  }
+  
+  // Green: within range
+  return '#10b981';
 }
 
 export function getMonthName(month: number): string {

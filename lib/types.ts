@@ -10,21 +10,23 @@ export type MealType =
 
 export interface MealData {
   type: MealType;
-  plannedMin: number;
-  plannedMax: number;
+  plannedMin: number | null;
+  plannedMax: number | null;
   actual: number | null;
   isDone: boolean;
 }
 
 export interface DayData {
   date: string; // YYYY-MM-DD format
-  dailyTarget: number;
+  dailyTargetMin: number | null;
+  dailyTargetMax: number | null;
   meals: MealData[];
 }
 
 export interface AppSettings {
-  dailyTarget: number;
-  defaultPlannedRanges: Record<MealType, { min: number; max: number }>;
+  dailyTargetMin: number | null;
+  dailyTargetMax: number | null;
+  defaultPlannedRanges: Record<MealType, { min: number | null; max: number | null }>;
 }
 
 export const MEAL_TYPES: MealType[] = [
