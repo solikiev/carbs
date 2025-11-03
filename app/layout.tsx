@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: 'Daily Net Carbs Tracker',
   description: 'Track your daily net carbs intake with meal planning and history',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/icon.svg',
+    apple: '/icon.svg',
+  },
   themeColor: '#10b981',
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
   appleWebApp: {
