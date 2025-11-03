@@ -103,7 +103,11 @@ export default function Home() {
       </div>
 
       <div className="mb-6">
-        <ProgressBar current={totalActual} target={dayData.dailyTarget} />
+        <ProgressBar 
+          current={totalActual} 
+          targetMin={dayData.dailyTargetMin} 
+          targetMax={dayData.dailyTargetMax} 
+        />
       </div>
 
       <div className="mb-6">

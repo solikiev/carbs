@@ -59,21 +59,55 @@ export default function SettingsPage() {
 
       <div className="space-y-6">
         <div className="bg-white rounded-lg shadow-lg p-4">
-          <h2 className="text-xl font-semibold mb-4">Daily Target</h2>
-          <div className="flex items-center gap-2">
-            <input
-              type="number"
-              value={settings.dailyTarget}
-              onChange={(e) =>
-                setSettings({
-                  ...settings,
-                  dailyTarget: parseInt(e.target.value, 10) || 0,
-                })
-              }
-              className="flex-1 px-3 py-2 border border-gray-300 rounded min-h-[44px]"
-              min="0"
-            />
-            <span className="text-gray-700">g</span>
+          <h2 className="text-xl font-semibold mb-4">Daily Target Range</h2>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Daily Target Minimum (g)
+              </label>
+              <input
+                type="number"
+                value={settings.dailyTargetMin ?? ''}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const num = value === '' ? null : parseInt(value, 10);
+                  setSettings({
+                    ...settings,
+                    dailyTargetMin: num,
+                  });
+                }}
+                placeholder="Enter minimum"
+                className="w-full px-3 py-2 border border-gray-300 rounded min-h-[44px]"
+                min="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Daily Target Maximum (g)
+              </label>
+              <input
+                type="number"
+                value={settings.dailyTargetMax ?? ''}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const num = value === '' ? null : parseInt(value, 10);
+                  setSettings({
+                    ...settings,
+                    dailyTargetMax: num,
+                  });
+                }}
+                placeholder="Enter maximum"
+                className="w-full px-3 py-2 border border-gray-300 rounded min-h-[44px]"
+                min="0"
+              />
+            </div>
+            {settings.dailyTargetMin !== null && 
+             settings.dailyTargetMax !== null && 
+             settings.dailyTargetMin > settings.dailyTargetMax && (
+              <p className="text-sm text-red-600">
+                Warning: Minimum should be less than or equal to maximum
+              </p>
+            )}
           </div>
         </div>
 
@@ -88,38 +122,44 @@ export default function SettingsPage() {
                 <div className="flex gap-2 items-center">
                   <input
                     type="number"
-                    value={settings.defaultPlannedRanges[mealType].min}
-                    onChange={(e) =>
+                    value={settings.defaultPlannedRanges[mealType].min ?? ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const num = value === '' ? null : parseInt(value, 10);
                       setSettings({
                         ...settings,
                         defaultPlannedRanges: {
                           ...settings.defaultPlannedRanges,
                           [mealType]: {
                             ...settings.defaultPlannedRanges[mealType],
-                            min: parseInt(e.target.value, 10) || 0,
+                            min: num,
                           },
                         },
-                      })
-                    }
+                      });
+                    }}
+                    placeholder="Min"
                     className="w-20 px-3 py-2 border border-gray-300 rounded text-center min-h-[44px]"
                     min="0"
                   />
                   <span className="text-gray-500">-</span>
                   <input
                     type="number"
-                    value={settings.defaultPlannedRanges[mealType].max}
-                    onChange={(e) =>
+                    value={settings.defaultPlannedRanges[mealType].max ?? ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const num = value === '' ? null : parseInt(value, 10);
                       setSettings({
                         ...settings,
                         defaultPlannedRanges: {
                           ...settings.defaultPlannedRanges,
                           [mealType]: {
                             ...settings.defaultPlannedRanges[mealType],
-                            max: parseInt(e.target.value, 10) || 0,
+                            max: num,
                           },
                         },
-                      })
-                    }
+                      });
+                    }}
+                    placeholder="Max"
                     className="w-20 px-3 py-2 border border-gray-300 rounded text-center min-h-[44px]"
                     min="0"
                   />

@@ -41,26 +41,44 @@ export function calculateTotalActual(meals: MealData[]): number {
 }
 
 export function calculateTotalPlannedMin(meals: MealData[]): number {
-  return meals.reduce((sum, meal) => sum + meal.plannedMin, 0);
+  return meals.reduce((sum, meal) => sum + (meal.plannedMin || 0), 0);
 }
 
 export function calculateTotalPlannedMax(meals: MealData[]): number {
-  return meals.reduce((sum, meal) => sum + meal.plannedMax, 0);
+  return meals.reduce((sum, meal) => sum + (meal.plannedMax || 0), 0);
 }
 
-export function calculateRemaining(dayData: DayData): number {
+export function calculateRemaining(dayData: DayData): { min: number | null; max: number | null } {
   const totalActual = calculateTotalActual(dayData.meals);
-  return dayData.dailyTarget - totalActual;
+  return {
+    min: dayData.dailyTargetMin !== null ? dayData.dailyTargetMin - totalActual : null,
+    max: dayData.dailyTargetMax !== null ? dayData.dailyTargetMax - totalActual : null,
+  };
 }
 
 export function calculateProgress(dayData: DayData): number {
   const totalActual = calculateTotalActual(dayData.meals);
-  return Math.min((totalActual / dayData.dailyTarget) * 100, 100);
+  const targetMax = dayData.dailyTargetMax;
+  if (targetMax === null || targetMax === 0) return 0;
+  return Math.min((totalActual / targetMax) * 100, 100);
 }
 
 export function isOverTarget(dayData: DayData): boolean {
   const totalActual = calculateTotalActual(dayData.meals);
-  return totalActual > dayData.dailyTarget;
+  if (dayData.dailyTargetMax === null) return false;
+  return totalActual > dayData.dailyTargetMax;
+}
+
+export function isUnderTarget(dayData: DayData): boolean {
+  const totalActual = calculateTotalActual(dayData.meals);
+  if (dayData.dailyTargetMin === null) return false;
+  return totalActual < dayData.dailyTargetMin;
+}
+
+export function isWithinTarget(dayData: DayData): boolean {
+  const totalActual = calculateTotalActual(dayData.meals);
+  if (dayData.dailyTargetMin === null || dayData.dailyTargetMax === null) return false;
+  return totalActual >= dayData.dailyTargetMin && totalActual <= dayData.dailyTargetMax;
 }
 
 export function getDayStatusColor(dayData: DayData | null): string {
@@ -69,7 +87,12 @@ export function getDayStatusColor(dayData: DayData | null): string {
   const totalActual = calculateTotalActual(dayData.meals);
   if (totalActual === 0) return 'transparent';
   
-  return isOverTarget(dayData) ? '#ef4444' : '#10b981';
+  // Three-color system: green (within), yellow (below min), red (above max)
+  if (isOverTarget(dayData)) return '#ef4444'; // red
+  if (isUnderTarget(dayData)) return '#eab308'; // yellow
+  if (isWithinTarget(dayData)) return '#10b981'; // green
+  
+  return 'transparent';
 }
 
 export function getMonthName(month: number): string {

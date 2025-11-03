@@ -60,7 +60,9 @@ export default function HistoryPage() {
                         {formatDisplayDate(day.date)}
                       </h3>
                       <p className="text-sm text-gray-600">
-                        {totalActual}g / {day.dailyTarget}g
+                        {totalActual}g / {day.dailyTargetMin !== null && day.dailyTargetMax !== null
+                          ? `${day.dailyTargetMin}-${day.dailyTargetMax}g`
+                          : 'No target set'}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">

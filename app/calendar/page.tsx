@@ -104,11 +104,15 @@ export default function CalendarPage() {
         <div className="mt-4 flex gap-4 text-sm">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-green-500 rounded"></div>
-            <span>Under target</span>
+            <span>Within target</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-yellow-500 rounded"></div>
+            <span>Below target</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-red-500 rounded"></div>
-            <span>Over target</span>
+            <span>Above target</span>
           </div>
         </div>
       </div>
@@ -122,7 +126,11 @@ export default function CalendarPage() {
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <p className="text-sm text-gray-600">Daily Target</p>
-              <p className="text-2xl font-bold text-gray-800">{selectedDay.dailyTarget}g</p>
+              <p className="text-2xl font-bold text-gray-800">
+                {selectedDay.dailyTargetMin !== null && selectedDay.dailyTargetMax !== null
+                  ? `${selectedDay.dailyTargetMin}-${selectedDay.dailyTargetMax}g`
+                  : 'Not Set'}
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Total Actual</p>
