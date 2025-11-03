@@ -101,10 +101,14 @@ export default function CalendarPage() {
           })}
         </div>
 
-        <div className="mt-4 flex gap-4 text-sm">
+        <div className="mt-4 flex gap-4 text-sm flex-wrap">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-green-500 rounded"></div>
-            <span>Under target</span>
+            <span>Within target</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-yellow-500 rounded"></div>
+            <span>Below target</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-red-500 rounded"></div>
@@ -122,7 +126,11 @@ export default function CalendarPage() {
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <p className="text-sm text-gray-600">Daily Target</p>
-              <p className="text-2xl font-bold text-gray-800">{selectedDay.dailyTarget}g</p>
+              <p className="text-2xl font-bold text-gray-800">
+                {selectedDay.dailyTargetMin !== null && selectedDay.dailyTargetMax !== null
+                  ? `${selectedDay.dailyTargetMin}-${selectedDay.dailyTargetMax}g`
+                  : 'Not Set'}
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Total Actual</p>
@@ -148,7 +156,7 @@ export default function CalendarPage() {
                   <span className="font-medium">{mealName}</span>
                   <div className="text-right">
                     <div className="text-sm text-gray-600">
-                      Planned: {meal.plannedMin}-{meal.plannedMax}g
+                      Planned: {meal.plannedMin ?? '-'}-{meal.plannedMax ?? '-'}g
                     </div>
                     <div className="text-sm font-semibold">
                       Actual: {meal.actual ?? '-'}g

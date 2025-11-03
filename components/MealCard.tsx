@@ -6,7 +6,7 @@ interface MealCardProps {
   meal: MealData;
   onUpdateActual: (actual: number | null) => void;
   onToggleDone: () => void;
-  onUpdatePlanned: (min: number, max: number) => void;
+  onUpdatePlanned: (min: number | null, max: number | null) => void;
 }
 
 export default function MealCard({ meal, onUpdateActual, onToggleDone, onUpdatePlanned }: MealCardProps) {
@@ -24,17 +24,25 @@ export default function MealCard({ meal, onUpdateActual, onToggleDone, onUpdateP
 
   const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const num = parseInt(value, 10);
-    if (!isNaN(num) && num >= 0) {
-      onUpdatePlanned(num, meal.plannedMax);
+    if (value === '') {
+      onUpdatePlanned(null, meal.plannedMax);
+    } else {
+      const num = parseInt(value, 10);
+      if (!isNaN(num) && num >= 0) {
+        onUpdatePlanned(num, meal.plannedMax);
+      }
     }
   };
 
   const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const num = parseInt(value, 10);
-    if (!isNaN(num) && num >= 0) {
-      onUpdatePlanned(meal.plannedMin, num);
+    if (value === '') {
+      onUpdatePlanned(meal.plannedMin, null);
+    } else {
+      const num = parseInt(value, 10);
+      if (!isNaN(num) && num >= 0) {
+        onUpdatePlanned(meal.plannedMin, num);
+      }
     }
   };
 
@@ -62,16 +70,18 @@ export default function MealCard({ meal, onUpdateActual, onToggleDone, onUpdateP
           <div className="flex gap-2 items-center">
             <input
               type="number"
-              value={meal.plannedMin}
+              value={meal.plannedMin ?? ''}
               onChange={handleMinChange}
+              placeholder="Min"
               className="w-20 px-3 py-2 border border-gray-300 rounded text-center min-h-[44px]"
               min="0"
             />
             <span className="text-gray-500">-</span>
             <input
               type="number"
-              value={meal.plannedMax}
+              value={meal.plannedMax ?? ''}
               onChange={handleMaxChange}
+              placeholder="Max"
               className="w-20 px-3 py-2 border border-gray-300 rounded text-center min-h-[44px]"
               min="0"
             />

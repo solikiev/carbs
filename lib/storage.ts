@@ -6,16 +6,17 @@ const STORAGE_KEYS = {
 };
 
 const DEFAULT_SETTINGS: AppSettings = {
-  dailyTarget: 150,
+  dailyTargetMin: null,
+  dailyTargetMax: null,
   defaultPlannedRanges: {
-    'breakfast': { min: 70, max: 80 },
-    'intra-workout': { min: 0, max: 0 },
-    'post-workout': { min: 0, max: 0 },
-    'lunch': { min: 40, max: 50 },
-    'snack-1': { min: 0, max: 0 },
-    'snack-2': { min: 0, max: 0 },
-    'snack-3': { min: 0, max: 0 },
-    'dinner': { min: 30, max: 40 },
+    'breakfast': { min: null, max: null },
+    'intra-workout': { min: null, max: null },
+    'post-workout': { min: null, max: null },
+    'lunch': { min: null, max: null },
+    'snack-1': { min: null, max: null },
+    'snack-2': { min: null, max: null },
+    'snack-3': { min: null, max: null },
+    'dinner': { min: null, max: null },
   },
 };
 
@@ -25,7 +26,23 @@ export const storage = {
     
     try {
       const allDays = this.getAllDays();
-      return allDays[date] || null;
+      const dayData = allDays[date];
+      if (!dayData) return null;
+      
+      // Migration: Convert old single dailyTarget to range
+      const anyDayData = dayData as any;
+      if ('dailyTarget' in anyDayData && !('dailyTargetMin' in anyDayData)) {
+        const oldTarget = anyDayData.dailyTarget;
+        const migratedData: DayData = {
+          date: dayData.date,
+          meals: dayData.meals,
+          dailyTargetMin: oldTarget,
+          dailyTargetMax: oldTarget,
+        };
+        return migratedData;
+      }
+      
+      return dayData;
     } catch (error) {
       console.error('Error getting day data:', error);
       return null;
@@ -73,7 +90,19 @@ export const storage = {
     
     try {
       const data = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-      return data ? { ...DEFAULT_SETTINGS, ...JSON.parse(data) } : DEFAULT_SETTINGS;
+      if (!data) return DEFAULT_SETTINGS;
+      
+      const parsed = JSON.parse(data);
+      
+      // Migration: Convert old single dailyTarget to range
+      if ('dailyTarget' in parsed && !('dailyTargetMin' in parsed)) {
+        const oldTarget = parsed.dailyTarget;
+        parsed.dailyTargetMin = oldTarget;
+        parsed.dailyTargetMax = oldTarget;
+        delete parsed.dailyTarget;
+      }
+      
+      return { ...DEFAULT_SETTINGS, ...parsed };
     } catch (error) {
       console.error('Error getting settings:', error);
       return DEFAULT_SETTINGS;
@@ -94,7 +123,8 @@ export const storage = {
     const settings = this.getSettings();
     return {
       date,
-      dailyTarget: settings.dailyTarget,
+      dailyTargetMin: settings.dailyTargetMin,
+      dailyTargetMax: settings.dailyTargetMax,
       meals: MEAL_TYPES.map(type => ({
         type,
         plannedMin: settings.defaultPlannedRanges[type].min,
